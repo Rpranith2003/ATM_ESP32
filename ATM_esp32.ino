@@ -10,14 +10,14 @@ using namespace std;
 #include <WiFiClientSecure.h>
 // Bot token and chat_id for telegram bot integration with ESP32
 #define BOTtoken "5797324424:AAF9P39imuTlBLvRlo3uYUqLkgp027BJbDk"
-#define CHAT_ID "1306455363"
+#define CHAT_ID "*********"
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 int botRequestDelay = 500;
 unsigned long lastTimeBotRan = 0;
 // WiFi Credentials for ESP32
-const char* ssid = "POCO";
-const char* password = "smartwork";
+const char* ssid = "****;
+const char* password = "****";
 String userID;
 String GOOGLE_SCRIPT_ID = "AKfycbxn_Fo_S9bxccs0Y93IsVXvJ_k1m8TgOLGX8cibL5ic1jfPbw1TYa8Mendfe-6x0AX";
 //Function to initialize and connect to the wifi specified above
@@ -156,7 +156,6 @@ void loop() {
   String welcome = "Welcome To iATM 💰.\n";
   welcome += "Send 1 to create a new account. �\n";
   welcome += "Send 2 to access an existing account. 💳\n";
-  welcome += "मराठी साठी 3 दाबा\n";
   bot.sendMessage(CHAT_ID, welcome, "");
   inputs = take_input(1);
   if (inputs[0] != "1" && inputs[0] != "2" && inputs[0] != "3") {
@@ -269,125 +268,6 @@ Statement send 3\nTo see your available balance send 4\nTo Log Out send 0","");
  }
         }
       }
-    } else if (inputs[0] == "3") {
-      // This field is for Marathi Language support
-      welcome = "";
-      welcome = "iATM मध्ये आपले स्वागत आहे.\n";
-      welcome += "नवीन खाते तयार करण्यासाठी 1 दाबा �\n";
-      welcome += "ववद्यमान खात्यात प्रवेश करण्यासाठी 2 दाबा 💳\n";
-      bot.sendMessage(CHAT_ID, welcome, "");
-      inputs = take_input(1);
-      if (inputs[0] != "1" && inputs[0] != "2") {
-        bot.sendMessage(CHAT_ID, "अवधै इनपटु ❌\nRedirecting.......", "");
-      } else {
-        if (inputs[0] == "1") {
-          // Creating new account
-          String newUsername, newPassword;
-          bot.sendMessage(CHAT_ID, "आपले नाांव ललहा 👤", "");
-          inputs = take_input(1);
-          newUsername = inputs[0];
-          bot.sendMessage(CHAT_ID, "नवीन पासवर्ड टाका 🔑", "");
-          inputs = take_input(1);
-          newPassword = inputs[0];
-          userID = writeGs(newUsername, newPassword);
-          if (userID != "Error") {
- bot.sendMessage(CHAT_ID,"तमु चे खाते यशस्वीररत्या तयार केले गेलेआहे.
-❌\n\n","");
- bot.sendMessage(CHAT_ID,"कृपया तमु चा UserID सरुक्षित ठेवा.\n","");
- bot.sendMessage(CHAT_ID,"तमु चा UserID आहे :"+userID,"");
-          } else {
- bot.sendMessage(CHAT_ID,"काही ताांत्रिक त्रबघार्ामळु े तमु चे खाते तयार केले
-जाऊ शकत नाही .❌\n\n","");
-          }
-        } else if (inputs[0] == "2") {
-          // debit or credit transaction
-          String UserID, password;
-          bot.sendMessage(CHAT_ID, "कृपया तमु चा UserID प्रववष्ट करा. 👤 :", "");
-          inputs = take_input(1);
-          UserID = inputs[0];
-          bot.sendMessage(CHAT_ID, "कृपया तमु चा पासवर्ड टाका 🔑:", "");
-          inputs = take_input(1);
-          password = inputs[0];
-          String realPassword;
-          realPassword = readGs(UserID.toInt() + 1, 'C');
-          if (realPassword != password) {
-            bot.sendMessage(CHAT_ID, "पासवर्ड चुकीचा आहे ❌", "");
-          } else {
-            bot.sendMessage(CHAT_ID, "पासवर्ड बरोबर आहे ❌", "");
-            while (true) {
-              String action;
-              String amount;
-              int amountToInt;
-              int presentAmt;
- bot.sendMessage(CHAT_ID,"क्रे डर्टसाठी 1 दाबा\nर्ेत्रबटसाठी 2 दाबा\nलमनी
-स्टेटमेंटसाठी 3 दाबा\nतमु चा balance पाहण्यासाठी 4 दाबा\nलॉगआउट करण्यासाठी 0 दाबा","");
- inputs=take_input(1);
- action=inputs[0];
- if(action=="0"){
-                break;
- }
- String history="";
- presentAmt=readGs(UserID.toInt()+1,'D').toInt();
- if(action!="3" && action!="4"){
-                bot.sendMessage(CHAT_ID, "रक्कम टाका :💰", "");
-                inputs = take_input(1);
-                amount = inputs[0];
-                history = amount;
-                amountToInt = amount.toInt();
- }
- if(action=="1"){
-                presentAmt = presentAmt + amountToInt;
-                amount = String(presentAmt);
-                bot.sendMessage(CHAT_ID, "व्यवहार यशस्वी झाला ❌", "");
-                String oldHistory = updateGs(UserID.toInt() + 1, 'D', amount);
-                oldHistory += ",+";
-                oldHistory += history;
-                updateHistory(UserID.toInt() + 1, 'E', oldHistory);
-                bot.sendMessage(CHAT_ID, "नवीन balance :", "");
-                bot.sendMessage(CHAT_ID, amount, "");
- }else if(action=="2"){
-                if (presentAmt < amountToInt) {
-                  bot.sendMessage(CHAT_ID, "अपरुा balance ‼️ ‼️", "");
-                  bot.sendMessage(CHAT_ID, "नवीन balance :", "");
-                  bot.sendMessage(CHAT_ID, String(presentAmt), "");
-                } else {
-                  presentAmt = presentAmt - amountToInt;
-                  bot.sendMessage(CHAT_ID, "व्यवहार यशस्वी झाला ❌", "");
-                  String oldHistory = updateGs(UserID.toInt() + 1, 'D', String(presentAmt));
-                  oldHistory += ",-";
-                  oldHistory += history;
-                  updateHistory(UserID.toInt() + 1, 'E', oldHistory);
-                  bot.sendMessage(CHAT_ID, "नवीन balance :", "");
-                  bot.sendMessage(CHAT_ID, String(presentAmt), "");
-                }
- }else if(action=="3"){
-                String miniStatement = readGs(UserID.toInt() + 1, 'E');
-                String miniMsg = "";
-                for (int i = 0; i < miniStatement.length(); i++) {
-                  if (miniStatement.charAt(i) == ',') {
-                    miniMsg = miniMsg + " Rs ";
-                    miniMsg = miniMsg + "\n";
-                  } else if (miniStatement.charAt(i) == ' ') {
-                    miniMsg = miniMsg + "जमा ";
-                  } else if (miniStatement.charAt(i) == '-') {
-                    miniMsg = miniMsg + "खचड ";
-                  } else {
-                    miniMsg = miniMsg + miniStatement.charAt(i);
-                  }
-                }
-                bot.sendMessage(CHAT_ID, miniMsg, "");
- }else if(action=="4"){
-                String userAvailableBalance = readGs(UserID.toInt() + 1, 'D');
-                userAvailableBalance = userAvailableBalance + " Rs.";
- bot.sendMessage(CHAT_ID,"तमु ची उपलब्ध balance आहे :
-"+userAvailableBalance,"");
- }else{
-                bot.sendMessage(CHAT_ID, "अवधै इनपटु 🚫", "");
- }
-            }
-          }
-        }
-      }
-    }
+    } 
   }
 }
